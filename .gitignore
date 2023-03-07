@@ -1,0 +1,8 @@
+*.json
+*.glb
+*.trskl
+*.class
+.idea/
+.gradle/
+build/
+out/
