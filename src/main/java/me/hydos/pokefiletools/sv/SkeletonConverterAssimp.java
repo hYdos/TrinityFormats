@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class SkeletonConverter {
+public class SkeletonConverterAssimp {
     private static final Gson GSON = new GsonBuilder().create();
     private static final Path SCHEMA = Paths.get("D:\\Projects\\hYdos\\PokeFileTools\\src\\main\\resources\\trskl.fbs");
 
@@ -25,6 +25,15 @@ public class SkeletonConverter {
                 "D:\\Projects\\hYdos\\PokeFileTools\\src\\test\\resources\\pm0133.glb",
                 Assimp.aiProcess_Triangulate | Assimp.aiProcess_PopulateArmatureData
         );
+
+        Matrix4f daeMat4 = new Matrix4f(
+                new Vector4f(1.000e0f, 1.490e-7f, -2.608e-8f, 3.496e-2f),
+                new Vector4f(-1.490e-7f, 1.000e0f, -1.222e-8f, -2.235e-8f),
+                new Vector4f(2.608e-8f, 1.222e-8f, 1.000e0f, 8.368e-11f),
+                new Vector4f(0.000e0f, 0.000e0f, 0.000e0f, 1.000e0f)
+        );
+        System.out.println("e");
+
 
         var nodeParents = new HashMap<String, String>();
         var nodeOffsets = new HashMap<String, Matrix4f>();
@@ -54,7 +63,7 @@ public class SkeletonConverter {
                     var name = bone.mName().dataString();
                     mayaTransformMatrix.invert();
 
-                    var boneOffset = nodeOffsets.get(name);
+                    var boneOffset = from(bone.mNode().mTransformation());
                     var trinityWhy = doMayaMatrixStuff(bone.mOffsetMatrix());
                     var nodeIdx = nodeParents.get(name) == null ? -1 : boneIds.get(nodeParents.get(name));
 

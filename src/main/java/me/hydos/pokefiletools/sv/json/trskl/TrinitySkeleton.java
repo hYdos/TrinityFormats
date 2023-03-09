@@ -30,9 +30,9 @@ public class TrinitySkeleton {
         public String type;
 
         public static class Transform {
-            private Vector3f VecScale;
-            private Vector3f VecRot;
-            private Vector3f VecTranslate;
+            public Vector3f VecScale;
+            public Vector3f VecRot;
+            public Vector3f VecTranslate;
 
             public Transform() {
             }
