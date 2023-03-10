@@ -12,10 +12,7 @@ public class GuiTestsUntilWifi {
     private static final Path TRANM_SCHEMA = Paths.get("C:/Users/allegra/Documents/PokeDocs-main/SV/Flatbuffers/animation/tranm.fbs");
 
     public static void main(String[] args) {
-        FlatCWrapper.convertToJson(TRANM_SCHEMA, Paths.get("C:/Users/allegra/Downloads/rest_start.tranm"));
-        
-        
-        var model = new GenericModel(Paths.get("C:/Users/allegra/Desktop/eeveeMale.glb"));
+        var model = new GenericModel(Paths.get("C:/Users/allegra/Desktop/eeveeMaleAnim.glb"));
         var skeleton = new TrinitySkeleton(model.skeleton, true);
 
         // Apply +90 degree x rotation root bones (any bones with -1 rig index which is the root and origin)

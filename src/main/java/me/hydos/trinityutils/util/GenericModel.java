@@ -1,5 +1,6 @@
 package me.hydos.trinityutils.util;
 
+import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.io.GltfModelReader;
 import org.joml.Quaternionf;
@@ -12,6 +13,7 @@ import java.util.*;
 public class GenericModel {
     private static final GltfModelReader READER = new GltfModelReader();
     public final Skeleton skeleton;
+    public final Map<String, Animation> animations;
 
     public GenericModel(Path path) {
         try {
@@ -19,6 +21,14 @@ public class GenericModel {
             if (gltfModel.getSkinModels().size() > 0)
                 this.skeleton = new Skeleton(gltfModel.getSkinModels().get(0));
             else this.skeleton = null;
+
+            if (gltfModel.getSkinModels().size() > 0) {
+                this.animations = new HashMap<>();
+
+                for (var animation : gltfModel.getAnimationModels()) {
+                    this.animations.put(animation.getName(), new Animation(animation));
+                }
+            } else this.animations = null;
         } catch (IOException e) {
             throw new RuntimeException("Failed to open stream for " + path.getFileName().toString(), e);
         }
@@ -150,6 +160,23 @@ public class GenericModel {
 
         private static Vector3f readVec3f(float[] arr, boolean defaultOnes) {
             return arr == null ? (defaultOnes ? new Vector3f(1, 1, 1) : new Vector3f()) : new Vector3f(arr[0], arr[1], arr[2]);
+        }
+    }
+
+    private static class Animation {
+
+        public Animation(AnimationModel animation) {
+            for (var channel : animation.getChannels()) {
+                if (channel.getSampler().getInterpolation() != AnimationModel.Interpolation.LINEAR)
+                    throw new RuntimeException("Linear Channels are supported only. TODO: Dynamic channel use other interpolation");
+
+                switch (channel.getPath()) {
+                    case "translation" -> {}
+                    case "rotation" -> {}
+                    case "scale" -> {}
+                    default -> throw new RuntimeException("Unknown channel type " + channel.getPath());
+                }
+            }
         }
     }
 }
