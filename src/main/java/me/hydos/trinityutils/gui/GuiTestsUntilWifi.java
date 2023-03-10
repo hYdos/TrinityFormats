@@ -13,7 +13,7 @@ public class GuiTestsUntilWifi {
         var model = new GenericModel(Paths.get("C:/Users/allegra/Desktop/eeveeMale.glb"));
         var skeleton = new TrinitySkeleton(model.skeleton, true);
 
-        // Apply +90 degree x rotation root bones (any bones with -1 rig index)
+        // Apply +90 degree x rotation root bones (any bones with -1 rig index which is the root and origin)
         for (var node : skeleton.transformNodes)
             if (node.rigIndex == -1) node.transform.rotation
                     .round()
