@@ -1,17 +1,24 @@
-package me.hydos.pokefiletools.sv;
+package me.hydos.trinityutils.util;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 public class FlatCWrapper {
     private static final boolean FLATC_INSTALLED = checkPath();
+    public static Path FLATC_LOCATION = null;
+
+    private static String flatc() {
+        if (FLATC_LOCATION == null) {
+            verifyFlatC();
+            return "flatc";
+        } else return FLATC_LOCATION.toAbsolutePath().toString();
+    }
 
     public static void convertToJson(Path schema, Path file) {
         try {
-            verifyFlatC();
             new ProcessBuilder()
                     .inheritIO()
-                    .command("D:/Programs/path/flatc.exe", "--raw-binary", "--defaults-json", "--strict-json", "-o", ".", "-t", schema.toAbsolutePath().toString(), "--", file.toAbsolutePath().toString())
+                    .command(flatc(), "--raw-binary", "--defaults-json", "--strict-json", "-o", ".", "-t", schema.toAbsolutePath().toString(), "--", file.toAbsolutePath().toString())
                     .start()
                     .waitFor();
         } catch (InterruptedException | IOException e) {
@@ -19,12 +26,12 @@ public class FlatCWrapper {
         }
     }
 
-    public static void convertToBinary(Path schema, Path file) {
+    public static void convertToBinary(Path workingDir, Path schema, Path file) {
         try {
-            verifyFlatC();
             new ProcessBuilder()
                     .inheritIO()
-                    .command("D:/Programs/path/flatc.exe", "-b", schema.toAbsolutePath().toString(), file.toAbsolutePath().toString())
+                    .directory(workingDir.toFile())
+                    .command(flatc(), "-b", schema.toAbsolutePath().toString(), file.toAbsolutePath().toString())
                     .start()
                     .waitFor();
         } catch (InterruptedException | IOException e) {

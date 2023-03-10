@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    implementation("de.javagl", "jgltf-model", "2.0.3")
     implementation("com.google.flatbuffers:flatbuffers-java:23.3.3")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.joml", "joml", "1.10.5")
