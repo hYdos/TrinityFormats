@@ -1,6 +1,7 @@
 package me.hydos.trinityutils.gui;
 
 import me.hydos.trinityutils.model.skeleton.TrinitySkeleton;
+import me.hydos.trinityutils.util.FlatCWrapper;
 import me.hydos.trinityutils.util.GenericModel;
 
 import java.nio.file.Path;
@@ -8,8 +9,12 @@ import java.nio.file.Paths;
 
 public class GuiTestsUntilWifi {
     private static final Path TRSKL_SCHEMA = Paths.get("C:/Users/allegra/Documents/PokeDocs-main/SV/Flatbuffers/model/trskl.fbs");
+    private static final Path TRANM_SCHEMA = Paths.get("C:/Users/allegra/Documents/PokeDocs-main/SV/Flatbuffers/animation/tranm.fbs");
 
     public static void main(String[] args) {
+        FlatCWrapper.convertToJson(TRANM_SCHEMA, Paths.get("C:/Users/allegra/Downloads/rest_start.tranm"));
+        
+        
         var model = new GenericModel(Paths.get("C:/Users/allegra/Desktop/eeveeMale.glb"));
         var skeleton = new TrinitySkeleton(model.skeleton, true);
 

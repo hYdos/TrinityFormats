@@ -96,6 +96,8 @@ public class TrinitySkeleton {
 
     public void exportToBinary(Path path, Path schemaLocation) {
         try {
+            if (!Files.readString(schemaLocation).contains("file_extension"))
+                throw new RuntimeException("Please add a file extension to your flatbuffer schema");
             var workingDir = Files.createTempDirectory("genBinFlatC");
             var json = workingDir.resolve("json.json");
             Files.writeString(json, GSON.toJson(this));
