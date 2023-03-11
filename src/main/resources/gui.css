@@ -1,0 +1,12 @@
+* {
+    -fx-background-color: #3C3F41;
+    -fx-text-fill: #BBBBBB;
+}
+
+.menuBar {
+    -fx-background-color: #313335;
+}
+
+#bordered {
+    -fx-border-color: #313335;
+}

@@ -166,6 +166,8 @@ public class GenericModel {
     private static class Animation {
 
         public Animation(AnimationModel animation) {
+            System.out.println("e");
+
             for (var channel : animation.getChannels()) {
                 if (channel.getSampler().getInterpolation() != AnimationModel.Interpolation.LINEAR)
                     throw new RuntimeException("Linear Channels are supported only. TODO: Dynamic channel use other interpolation");

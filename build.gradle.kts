@@ -1,11 +1,17 @@
 plugins {
     id("java")
+    id("org.openjfx.javafxplugin") version "0.0.13"
 }
 
 group = "me.hydos"
 version = "1.0-SNAPSHOT"
 val lwjglVersion = "3.3.2-SNAPSHOT"
 val lwjglNatives = "natives-windows"
+
+javafx {
+    version = "19"
+    modules("javafx.controls", "javafx.fxml")
+}
 
 repositories {
     mavenCentral()
