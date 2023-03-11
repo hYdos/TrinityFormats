@@ -1,12 +1,17 @@
 * {
     -fx-background-color: #3C3F41;
     -fx-text-fill: #BBBBBB;
+    -fx-base: #3C3F41;
+    -fx-control-inner-background: #3C3F41;
+    -fx-selection-bar: #2c2e2f;
+    -fx-focused-mark-color: -fx-focused-text-base-color;
+    -fx-selection-bar-non-focused: #3C3F41;
+}
+
+.splitPane {
+    -fx-base: #3C3F41;
 }
 
 .menuBar {
-    -fx-background-color: #313335;
-}
-
-#bordered {
-    -fx-border-color: #313335;
+    -fx-background-color: -fx-control-inner-background;
 }
