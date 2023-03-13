@@ -65,11 +65,12 @@ public class TrinitySkeleton {
 
     public static TrinitySkeleton read(Path path) {
         var rawFileName = path.getFileName().toString();
-        var fileExtension = rawFileName.substring(rawFileName.lastIndexOf("."));
+        var fileExtension = rawFileName.substring(rawFileName.lastIndexOf(".") + 1);
 
         return switch (fileExtension) {
             case "json" -> readJson(path);
-            case "trskl", "bin" -> {throw new RuntimeException("Not Implemented");}
+            case "trskl", "bin" -> throw new RuntimeException("Not Implemented");
+            default -> throw new RuntimeException("Unknown format " + fileExtension);
         };
     }
 

@@ -36,9 +36,12 @@ public class SkeletonDiffer {
 
         System.out.println("======Diff (Transform Node Deep Diff. Ignoring Extra Bones)======");
         var incorrectCount = 0;
+        var incorrectType = 0;
+        var incorrectCountAndType = 0;
         for (var entry : correctToOursMap.entrySet()) {
             var correct = entry.getKey();
             var ours = entry.getValue();
+            if(!correct.type.equals(ours.type)) incorrectType++;
 
             if (skeleton.isInDegrees()) {
                 if (Math.round(correct.transform.rotation.x) != Math.round(ours.transform.rotation.x) &&
@@ -46,7 +49,9 @@ public class SkeletonDiffer {
                         Math.round(correct.transform.rotation.z) != Math.round(ours.transform.rotation.z)
                 ) {
                     incorrectCount++;
+                    if(!correct.type.equals(ours.type)) incorrectCountAndType++;
                     System.out.println("\nINCORRECT TRANSFORM: " + correct.name);
+                    System.out.println("\nBone Type: " + correct.type);
                     System.out.println("Correct Rotations");
                     System.out.println("X: " + Math.round(correct.transform.rotation.x));
                     System.out.println("Y: " + Math.round(correct.transform.rotation.y));
@@ -62,7 +67,9 @@ public class SkeletonDiffer {
                         Math.round(correct.transform.rotation.z * 1000f) / 1000f != Math.round(ours.transform.rotation.z * 1000f) / 1000f
                 ) {
                     incorrectCount++;
+                    if(!correct.type.equals(ours.type)) incorrectCountAndType++;
                     System.out.println("\nINCORRECT TRANSFORM: " + correct.name);
+                    System.out.println("\nBone Type: " + correct.type);
                     System.out.println("Correct Rotations");
                     printRadiansTransform(correct);
                     System.out.println("Our Rotations");
@@ -71,7 +78,10 @@ public class SkeletonDiffer {
             }
         }
 
+        incorrectType = incorrectType - incorrectCountAndType;
         System.out.println("Incorrect Transforms: (" + incorrectCount + "/" + skeleton.transformNodes.size() + ")");
+        System.out.printf("%d%% of incorrect transforms have the wrong typing.\n", Math.round((incorrectCountAndType / (double) incorrectCount) * 100));
+        System.out.printf("%d types were incorrect but the the values are correct.\n", incorrectType);
     }
 
     private static void printRadiansTransform(TrinitySkeleton.TransformNode node) {
