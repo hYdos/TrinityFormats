@@ -1,8 +1,9 @@
-package me.hydos.trinityutils.model.skeleton;
+package me.hydos.trinityutils.format.tr2022.skeleton;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
+import me.hydos.trinityutils.launch.GuiApplication;
 import me.hydos.trinityutils.util.FlatCWrapper;
 import me.hydos.trinityutils.util.GenericModel;
 import org.joml.Vector3f;
@@ -25,8 +26,6 @@ public class TrinitySkeleton {
     public ArrayList<Bone> bones;
     @SerializedName("iks")
     public ArrayList<InverseKinematic> inverseKinematics;
-    @SerializedName("rig_offset")
-    public int rigOffset;
     private boolean inDegrees;
 
     public TrinitySkeleton() {
@@ -64,6 +63,24 @@ public class TrinitySkeleton {
         }
     }
 
+    public static TrinitySkeleton read(Path path) {
+        var rawFileName = path.getFileName().toString();
+        var fileExtension = rawFileName.substring(rawFileName.lastIndexOf("."));
+
+        return switch (fileExtension) {
+            case "json" -> readJson(path);
+            case "trskl", "bin" -> {throw new RuntimeException("Not Implemented");}
+        };
+    }
+
+    public static TrinitySkeleton readJson(Path path) {
+        try {
+            return GSON.fromJson(Files.readString(path), TrinitySkeleton.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed reading TrinitySkeleton json", e);
+        }
+    }
+
     public void convertToRadians() {
         if (!inDegrees) throw new RuntimeException("Cannot go from radians to radians");
 
@@ -80,7 +97,11 @@ public class TrinitySkeleton {
 
         for (var transformNode : transformNodes) {
             var radiansRot = transformNode.transform.rotation;
-            transformNode.transform.rotation = new Vector3f((float) Math.toDegrees(radiansRot.x()), (float) Math.toDegrees(radiansRot.y()), (float) Math.toDegrees(radiansRot.z()));
+            transformNode.transform.rotation = new Vector3f(
+                    (float) Math.toDegrees(radiansRot.x()),
+                    (float) Math.toDegrees(radiansRot.y()),
+                    (float) Math.toDegrees(radiansRot.z())
+            );
         }
 
         inDegrees = true;
@@ -94,8 +115,9 @@ public class TrinitySkeleton {
         }
     }
 
-    public void exportToBinary(Path path, Path schemaLocation) {
+    public void exportToBinary(Path path) {
         try {
+            var schemaLocation = GuiApplication.TRSKL_SCHEMA;
             if (!Files.readString(schemaLocation).contains("file_extension"))
                 throw new RuntimeException("Please add a file extension to your flatbuffer schema");
             var workingDir = Files.createTempDirectory("genBinFlatC");
@@ -108,6 +130,10 @@ public class TrinitySkeleton {
         } catch (IOException e) {
             throw new RuntimeException("Failed exporting TrinitySkeleton", e);
         }
+    }
+
+    public boolean isInDegrees() {
+        return inDegrees;
     }
 
     public static class TransformNode {

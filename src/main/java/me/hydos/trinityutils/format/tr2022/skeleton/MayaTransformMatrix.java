@@ -1,4 +1,4 @@
-package me.hydos.trinityutils.model.skeleton;
+package me.hydos.trinityutils.format.tr2022.skeleton;
 
 import org.joml.Vector3f;
 

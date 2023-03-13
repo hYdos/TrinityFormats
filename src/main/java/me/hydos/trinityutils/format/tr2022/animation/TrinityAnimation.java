@@ -1,7 +1,7 @@
-package me.hydos.trinityutils.model.animation;
+package me.hydos.trinityutils.format.tr2022.animation;
 
 import com.google.gson.annotations.SerializedName;
-import me.hydos.trinityutils.model.animation.track.AnimationTrack;
+import me.hydos.trinityutils.format.tr2022.animation.track.AnimationTrack;
 
 import java.util.List;
 
