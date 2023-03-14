@@ -3,12 +3,15 @@ package me.hydos.trinityutils.util;
 import de.javagl.jgltf.model.AnimationModel;
 import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.io.GltfModelReader;
-import org.joml.Quaternionf;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class GenericModel {
     private static final GltfModelReader READER = new GltfModelReader();
@@ -51,10 +54,6 @@ public class GenericModel {
             }
         }
 
-        public Bone getBone(int id) {
-            return bones[id];
-        }
-
         public Bone getBone(String name) {
             return nameMap.get(name);
         }
@@ -72,20 +71,44 @@ public class GenericModel {
     public static final class Bone {
         private final int id;
         private final String name;
-        private final Vector3f translation;
-        private final Vector3f rotDegrees;
-        private final Vector3f rotRadians;
-        private final Vector3f scale;
+        private final Matrix4f offset;
         private final String parent;
 
         public Bone(int id, String name, float[] translation, float[] rotation, float[] scale, String parent) {
             this.id = id;
             this.name = name;
             this.parent = parent;
-            this.translation = readVec3f(translation, false);
-            this.rotRadians = readQuaternion(rotation, false);
-            this.rotDegrees = readQuaternion(rotation, true);
-            this.scale = readVec3f(scale, true);
+            this.offset = convert(translation, rotation, scale);
+        }
+
+        private static Matrix4f convert(float[] translation, float[] rotation, float[] scale) {
+            var mat4 = new Matrix4f().identity();
+            if (translation != null) mat4.translate(translation[0], translation[1], translation[2]);
+            if (rotation != null) mat4.rotate(rotation[0], rotation[1], rotation[2], rotation[3]);
+            if (scale != null) mat4.scale(scale[0], scale[1], scale[2]);
+
+            return mat4;
+        }
+
+        public Vector3f getTransform() {
+            return offset.getTranslation(new Vector3f());
+        }
+
+        public Vector3f getRotation() {
+            return offset.getEulerAnglesXYZ(new Vector3f());
+        }
+
+        public Vector3f getRotationDegrees() {
+            var rotRadians = getRotation();
+            return new Vector3f(
+                    (float) Math.toDegrees(rotRadians.x),
+                    (float) Math.toDegrees(rotRadians.y),
+                    (float) Math.toDegrees(rotRadians.z)
+            );
+        }
+
+        public Vector3f getScale() {
+            return offset.getScale(new Vector3f());
         }
 
         public String parent() {
@@ -99,68 +122,6 @@ public class GenericModel {
         public String name() {
             return name;
         }
-
-        public Vector3f translation() {
-            return translation;
-        }
-
-        public Vector3f rotDegrees() {
-            return rotDegrees;
-        }
-
-        public Vector3f rotRadians() {
-            return rotRadians;
-        }
-
-        public Vector3f scale() {
-            return scale;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
-            var that = (Bone) obj;
-            return this.id == that.id &&
-                    Objects.equals(this.name, that.name) &&
-                    Objects.equals(this.translation, that.translation) &&
-                    Objects.equals(this.rotDegrees, that.rotDegrees) &&
-                    Objects.equals(this.rotRadians, that.rotRadians) &&
-                    Objects.equals(this.scale, that.scale);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, name, translation, rotDegrees, rotRadians, scale);
-        }
-
-        @Override
-        public String toString() {
-            return "Bone[" +
-                    "id=" + id + ", " +
-                    "name=" + name + ", " +
-                    "translation=" + translation + ", " +
-                    "rotDegrees=" + rotDegrees + ", " +
-                    "rotRadians=" + rotRadians + ", " +
-                    "scale=" + scale + ']';
-        }
-
-        private static Vector3f readQuaternion(float[] arr, boolean convertToDegrees) {
-            var quaternion = arr == null ? new Quaternionf() : new Quaternionf(arr[0], arr[1], arr[2], arr[3]);
-            var result = quaternion.getEulerAnglesXYZ(new Vector3f());
-
-            if (convertToDegrees) {
-                result.x = (float) Math.toDegrees(result.x);
-                result.y = (float) Math.toDegrees(result.y);
-                result.z = (float) Math.toDegrees(result.z);
-            }
-
-            return result;
-        }
-
-        private static Vector3f readVec3f(float[] arr, boolean defaultOnes) {
-            return arr == null ? (defaultOnes ? new Vector3f(1, 1, 1) : new Vector3f()) : new Vector3f(arr[0], arr[1], arr[2]);
-        }
     }
 
     private static class Animation {
@@ -173,9 +134,12 @@ public class GenericModel {
                     throw new RuntimeException("Linear Channels are supported only. TODO: Dynamic channel use other interpolation");
 
                 switch (channel.getPath()) {
-                    case "translation" -> {}
-                    case "rotation" -> {}
-                    case "scale" -> {}
+                    case "translation" -> {
+                    }
+                    case "rotation" -> {
+                    }
+                    case "scale" -> {
+                    }
                     default -> throw new RuntimeException("Unknown channel type " + channel.getPath());
                 }
             }

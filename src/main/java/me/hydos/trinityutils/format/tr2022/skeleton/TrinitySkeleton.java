@@ -47,9 +47,9 @@ public class TrinitySkeleton {
             var node = new TrinitySkeleton.TransformNode(
                     bone.name(),
                     new TrinitySkeleton.TransformNode.Transform(
-                            bone.scale(),
-                            useDegrees ? bone.rotDegrees() : bone.rotRadians(),
-                            bone.translation()
+                            bone.getScale(),
+                            inDegrees ? bone.getRotationDegrees() : bone.getRotation(),
+                            bone.getTransform()
                     ),
                     new Vector3f(),
                     new Vector3f(),
@@ -170,10 +170,10 @@ public class TrinitySkeleton {
             @Override
             public String toString() {
                 return "Transform{" +
-                        ", translation=" + translate +
-                        ", rotation=" + rotation +
-                        "scale=" + scale +
-                        '}';
+                       ", translation=" + translate +
+                       ", rotation=" + rotation +
+                       "scale=" + scale +
+                       '}';
             }
         }
 
@@ -194,11 +194,11 @@ public class TrinitySkeleton {
         @Override
         public String toString() {
             return "TransformNode{" +
-                    "name='" + name + '\'' +
-                    ", transform=" + transform +
-                    ", parent_idx=" + parentIndex +
-                    ", rig_idx=" + rigIndex +
-                    '}';
+                   "name='" + name + '\'' +
+                   ", transform=" + transform +
+                   ", parent_idx=" + parentIndex +
+                   ", rig_idx=" + rigIndex +
+                   '}';
         }
     }
 

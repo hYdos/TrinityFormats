@@ -5,15 +5,24 @@ import me.hydos.trinityutils.format.tr2022.skeleton.TrinitySkeleton;
 import me.hydos.trinityutils.util.GenericModel;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class SkeletonDiffer {
 
     public static void main(String[] args) {
-        var model = new GenericModel(Paths.get("C:/Users/allegra/Desktop/eeveeMale.glb"));
-        var correctSkeleton = TrinitySchemas.latest().getSkeletonSchema().read(Paths.get("C:/Users/allegra/Downloads/pm0133_00_00.json"));
+        var model = new GenericModel(Paths.get("D:\\Projects\\hYdos\\PokeFileTools\\src\\test\\resources\\pm0133.glb"));
+        var correctSkeleton = TrinitySchemas.latest().getSkeletonSchema().read(Paths.get("D:\\Projects\\hYdos\\PokeFileTools\\pm0133_00_00.json"));
         var skeleton = new TrinitySkeleton(model.skeleton, true);
         correctSkeleton.convertToDegrees();
+
+        // Blender fixes
+//        for (var node : skeleton.transformNodes) {
+//            if(node.name.equals("waist")) {
+//                node.transform.rotation.add(0, -90, 90);
+//            }
+//        }
 
         // Compare the Skeletons
         System.out.println("======Diff (Transform Node Count)======");
@@ -35,21 +44,17 @@ public class SkeletonDiffer {
         }
 
         System.out.println("======Diff (Transform Node Deep Diff. Ignoring Extra Bones)======");
-        var incorrectCount = 0;
-        var incorrectType = 0;
-        var incorrectCountAndType = 0;
+        var incorrectNodes = new ArrayList<TrinitySkeleton.TransformNode>();
         for (var entry : correctToOursMap.entrySet()) {
             var correct = entry.getKey();
             var ours = entry.getValue();
-            if(!correct.type.equals(ours.type)) incorrectType++;
 
             if (skeleton.isInDegrees()) {
                 if (Math.round(correct.transform.rotation.x) != Math.round(ours.transform.rotation.x) &&
-                        Math.round(correct.transform.rotation.y) != Math.round(ours.transform.rotation.y) &&
-                        Math.round(correct.transform.rotation.z) != Math.round(ours.transform.rotation.z)
+                    Math.round(correct.transform.rotation.y) != Math.round(ours.transform.rotation.y) &&
+                    Math.round(correct.transform.rotation.z) != Math.round(ours.transform.rotation.z)
                 ) {
-                    incorrectCount++;
-                    if(!correct.type.equals(ours.type)) incorrectCountAndType++;
+                    incorrectNodes.add(ours);
                     System.out.println("\nINCORRECT TRANSFORM: " + correct.name);
                     System.out.println("\nBone Type: " + correct.type);
                     System.out.println("Correct Rotations");
@@ -61,32 +66,9 @@ public class SkeletonDiffer {
                     System.out.println("Y: " + Math.round(ours.transform.rotation.y));
                     System.out.println("Z: " + Math.round(ours.transform.rotation.z));
                 }
-            } else {
-                if ((correct.transform.rotation.x * 1000f) / 1000f != Math.round(ours.transform.rotation.x * 1000f) / 1000f &&
-                        Math.round(correct.transform.rotation.y * 1000f) / 1000f != Math.round(ours.transform.rotation.y * 1000f) / 1000f &&
-                        Math.round(correct.transform.rotation.z * 1000f) / 1000f != Math.round(ours.transform.rotation.z * 1000f) / 1000f
-                ) {
-                    incorrectCount++;
-                    if(!correct.type.equals(ours.type)) incorrectCountAndType++;
-                    System.out.println("\nINCORRECT TRANSFORM: " + correct.name);
-                    System.out.println("\nBone Type: " + correct.type);
-                    System.out.println("Correct Rotations");
-                    printRadiansTransform(correct);
-                    System.out.println("Our Rotations");
-                    printRadiansTransform(ours);
-                }
             }
         }
 
-        incorrectType = incorrectType - incorrectCountAndType;
-        System.out.println("Incorrect Transforms: (" + incorrectCount + "/" + skeleton.transformNodes.size() + ")");
-        System.out.printf("%d%% of incorrect transforms have the wrong typing.\n", Math.round((incorrectCountAndType / (double) incorrectCount) * 100));
-        System.out.printf("%d types were incorrect but the the values are correct.\n", incorrectType);
-    }
-
-    private static void printRadiansTransform(TrinitySkeleton.TransformNode node) {
-        System.out.println("X: " + Math.round(node.transform.rotation.x * 1000f) / 1000f);
-        System.out.println("Y: " + Math.round(node.transform.rotation.y * 1000f) / 1000f);
-        System.out.println("Z: " + Math.round(node.transform.rotation.z * 1000f) / 1000f);
+        System.out.println("Incorrect Transforms: (" + incorrectNodes.size() + "/" + skeleton.transformNodes.size() + ")");
     }
 }

@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class GuiApplication extends Application {
-    public static final Path TRSKL_SCHEMA = Paths.get("C:/Users/allegra/Documents/PokeDocs-main/SV/Flatbuffers/model/trskl.fbs");
+    public static final Path TRSKL_SCHEMA = Paths.get("D:\\Projects\\hYdos\\PokeFileTools\\src\\main\\resources\\trskl.fbs");
     private static final Path TRANM_SCHEMA = Paths.get("C:/Users/allegra/Documents/PokeDocs-main/SV/Flatbuffers/animation/tranm.fbs");
 
     public static void main(String[] args) {
