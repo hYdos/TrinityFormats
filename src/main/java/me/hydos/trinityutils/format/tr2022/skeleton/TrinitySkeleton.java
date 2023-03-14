@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class TrinitySkeleton {
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
+            .serializeSpecialFloatingPointValues()
             .excludeFieldsWithModifiers(Modifier.PRIVATE)
             .create();
     @SerializedName("res_0")
@@ -87,7 +88,11 @@ public class TrinitySkeleton {
 
         for (var transformNode : transformNodes) {
             var degreesRot = transformNode.transform.rotation;
-            transformNode.transform.rotation = new Vector3f((float) Math.toRadians(degreesRot.x()), (float) Math.toRadians(degreesRot.y()), (float) Math.toRadians(degreesRot.z()));
+            transformNode.transform.rotation = new Vector3f(
+                    (float) Math.toRadians(degreesRot.x()),
+                    (float) Math.toRadians(degreesRot.y()),
+                    (float) Math.toRadians(degreesRot.z())
+            );
         }
 
         inDegrees = false;

@@ -5,13 +5,13 @@ import de.javagl.jgltf.model.SkinModel;
 import de.javagl.jgltf.model.io.GltfModelReader;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.lwjgl.assimp.AIMatrix4x4;
+import org.lwjgl.assimp.AINode;
+import org.lwjgl.assimp.Assimp;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class GenericModel {
     private static final GltfModelReader READER = new GltfModelReader();
@@ -20,9 +20,10 @@ public class GenericModel {
 
     public GenericModel(Path path) {
         try {
+            var scene = Assimp.aiImportFile(path.toAbsolutePath().toString(), Assimp.aiProcess_PopulateArmatureData);
             var gltfModel = READER.read(path);
             if (gltfModel.getSkinModels().size() > 0)
-                this.skeleton = new Skeleton(gltfModel.getSkinModels().get(0));
+                this.skeleton = new Skeleton(scene.mRootNode());
             else this.skeleton = null;
 
             if (gltfModel.getSkinModels().size() > 0) {
@@ -54,6 +55,44 @@ public class GenericModel {
             }
         }
 
+        public Skeleton(AINode root) {
+            var boneList = new ArrayList<Bone>();
+            this.nameMap = new HashMap<>();
+
+            readBone(root, null, boneList, nameMap);
+            this.bones = boneList.toArray(new Bone[0]);
+        }
+
+        private void readBone(AINode current, String parent, ArrayList<Bone> boneList, Map<String, Bone> nameMap) {
+            var name = current.mName().dataString();
+            var bone = new Bone(boneList.size(), name, from(current.mTransformation()), parent);
+            boneList.add(bone);
+            nameMap.put(name, bone);
+
+            for (int i = 0; i < current.mNumChildren(); i++)
+                readBone(AINode.create(current.mChildren().get(i)), current.mName().dataString(), boneList, nameMap);
+        }
+
+        public static Matrix4f from(AIMatrix4x4 aiMat4) {
+            return new Matrix4f()
+                    .m00(aiMat4.a1())
+                    .m10(aiMat4.a2())
+                    .m20(aiMat4.a3())
+                    .m30(aiMat4.a4())
+                    .m01(aiMat4.b1())
+                    .m11(aiMat4.b2())
+                    .m21(aiMat4.b3())
+                    .m31(aiMat4.b4())
+                    .m02(aiMat4.c1())
+                    .m12(aiMat4.c2())
+                    .m22(aiMat4.c3())
+                    .m32(aiMat4.c4())
+                    .m03(aiMat4.d1())
+                    .m13(aiMat4.d2())
+                    .m23(aiMat4.d3())
+                    .m33(aiMat4.d4());
+        }
+
         public Bone getBone(String name) {
             return nameMap.get(name);
         }
@@ -74,11 +113,18 @@ public class GenericModel {
         private final Matrix4f offset;
         private final String parent;
 
+        public Bone(int id, String name, Matrix4f offset, String parent) {
+            this.id = id;
+            this.name = name;
+            this.offset = offset;
+            this.parent = parent;
+        }
+
         public Bone(int id, String name, float[] translation, float[] rotation, float[] scale, String parent) {
             this.id = id;
             this.name = name;
-            this.parent = parent;
             this.offset = convert(translation, rotation, scale);
+            this.parent = parent;
         }
 
         private static Matrix4f convert(float[] translation, float[] rotation, float[] scale) {
