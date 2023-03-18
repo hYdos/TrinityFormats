@@ -27,6 +27,8 @@ public class TrinitySkeleton {
     public ArrayList<Bone> bones;
     @SerializedName("iks")
     public ArrayList<InverseKinematic> inverseKinematics;
+    @SerializedName("rig_offset")
+    public int rigOffset;
     private boolean inDegrees;
 
     public TrinitySkeleton() {

@@ -43,6 +43,8 @@ public class SkeletonDiffer {
             }
         }
 
+        if (!(skeleton.isInDegrees() && correctSkeleton.isInDegrees())) throw new RuntimeException();
+
         System.out.println("======Diff (Transform Node Deep Diff. Ignoring Extra Bones)======");
         var incorrectNodes = new ArrayList<TrinitySkeleton.TransformNode>();
         for (var entry : correctToOursMap.entrySet()) {
@@ -55,8 +57,8 @@ public class SkeletonDiffer {
                     Math.round(correct.transform.rotation.z) != Math.round(ours.transform.rotation.z)
                 ) {
                     incorrectNodes.add(ours);
-                    System.out.println("/nINCORRECT TRANSFORM: " + correct.name);
-                    System.out.println("/nBone Type: " + correct.type);
+                    System.out.println("\nINCORRECT TRANSFORM: " + correct.name);
+                    System.out.println("Bone Type: " + correct.type);
                     System.out.println("Correct Rotations");
                     System.out.println("X: " + Math.round(correct.transform.rotation.x));
                     System.out.println("Y: " + Math.round(correct.transform.rotation.y));
